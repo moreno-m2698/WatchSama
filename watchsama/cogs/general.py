@@ -23,7 +23,7 @@ def stop(bot: discord.Client):
 def info(bot: discord.Client):
     @bot.command()
     async def info(ctx: commands.Context) -> discord.Message:
-        embed = WatchSamaEmbed(title="WatchSama", url = 'https://github.com/moreno-m2698/Watchsama-Discord-Bot', description='Developers: keopi.')
+        embed = WatchSamaEmbed(title="WatchSama", url = 'https://github.com/moreno-m2698/WatchSama', description='Developers: .keopi')
         await ctx.send(embed=embed)
 
 
