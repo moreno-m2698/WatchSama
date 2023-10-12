@@ -4,7 +4,7 @@
 
 ## About: 
 
-WatchSama is an open-source Discord bot that aims to be the go to bot in allowing users to express their anime interests by sharing their [MyAnimeList](https//:myanimelist.net) statistics to their Discord server.
+WatchSama is an open-source Discord bot that aims to be the go to bot in connecting your Discord account with your MyAnimeList account. By using WatchSama you will be able to share and express your anime interests from your MAL account with your discord server through its custom generated views and embeds in a visual appealing way. WatchSama also has search capabilties as well so you will be able to search for anime recommendations by using its built in search command!
 
 This bot is available for anyone to clone and edit to match their server needs.
 
