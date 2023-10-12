@@ -53,3 +53,11 @@ To receive your application key, select the Application you are wanting to gener
 ### Generate Bot Invitation Link
 
 To generate the invitation link for your bot you will want to select URL Generator under the OAuth2 tab of your application settings. From there you will want to select the bot checkbot under Scopes which will then cause the Bot Permissions table to open up. Under general permissions select the Administrator checkbox and copy the generated url at the bottom of the page. Upon navigating to this url you will be able to invite the bot to your desired server.
+
+### Commands
+
+- !watching - this command will generate a list of embeds and progress bars for shows that are currently being watched on the linked account.
+
+- !complete - This command will generate a list of embeds to show off what shows you have completed.
+
+- !search `args` - This command will provide you search result information from MyAnimeList.
