@@ -24,10 +24,6 @@ Before you begin using this bot you will need to create a Discord developer acco
 
 > Note that you can edit the public name of the bot and its profile picture under the bot tag of the selected project's settings.
 
-
-
-
-
 ### Installation
 
 Next you will want to install the bot by cloning the repository into a file using:
@@ -53,6 +49,10 @@ To receive your application key, select the Application you are wanting to gener
 ### Generate Bot Invitation Link
 
 To generate the invitation link for your bot you will want to select URL Generator under the OAuth2 tab of your application settings. From there you will want to select the bot checkbot under Scopes which will then cause the Bot Permissions table to open up. Under general permissions select the Administrator checkbox and copy the generated url at the bottom of the page. Upon navigating to this url you will be able to invite the bot to your desired server.
+
+### Additional Edits
+
+WatchSama uses custom emotes to generate the watch progress bar. In order to use the feature you must add these emotes to your server and replace the values inside of [this file](https://github.com/moreno-m2698/WatchSama/blob/main/watchsama/cogs/mal/API/Embeds.py) under `ExtendedEmbed`, `self._emoji_bar_dict`.
 
 ### Commands
 
