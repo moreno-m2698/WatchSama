@@ -18,7 +18,7 @@ This bot is available for anyone to clone and edit to match their server needs.
 
 ---
 
-### Creating Discord Devloper Project
+### Creating Discord Developer Project
 
 Before you begin using this bot you will need to create a Discord developer account which can be done [here](https://discord.com/developers). Once you have logged in you will want to create a new application by hitting the `New Application` button and naming your application. 
 
