@@ -7,6 +7,7 @@ from discord.ext import commands
 from discord.ext.commands.cog import Cog
 from discord.ext.commands.core import Command, Group, Callable
 
+import logging
 
 import watchsama
 #----------------------------------------------------------------------------------
@@ -19,6 +20,8 @@ print('''
            \/        \/          \/     \/                  \/     \/      \/     \/ 
        by keopi#4078 |
     ''')
+
+handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
 
 intents = discord.Intents.default()
 intents.message_content = True
