@@ -5,3 +5,6 @@ coverage/
 *.log
 .venv/
 **/__pycache__/
+
+# Claude Code agent worktrees
+.claude/worktrees/
