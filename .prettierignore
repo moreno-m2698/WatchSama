@@ -1,0 +1,9 @@
+node_modules
+dist
+coverage
+pnpm-lock.yaml
+.venv
+assets
+docs
+README.md
+watchsama
