@@ -1,6 +1,6 @@
 # WatchSama Refactor Plan: Python/discord.py/Selenium → TypeScript/discord.js/MAL API v2
 
-Branch: `refactor`. Status: **Phases 0–1 complete; Phase 2 (integration) done except the live smoke test.**
+Branch: `refactor`. Status: **Complete.** All phases are done, and the live smoke test passed in DEV_GUILD on 2026-11-17.
 
 ## 1. Decisions (locked)
 
