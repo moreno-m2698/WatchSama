@@ -185,27 +185,41 @@ export interface SlashCommand {
 - **List request:** `GET /users/{encodeURIComponent(user)}/animelist?status=…&sort=list_updated_at&limit=min(limit,100)&fields=list_status,num_episodes,media_type,synopsis,main_picture`. Follow `paging.next` until `limit` is reached or there is no next page.
 - **Search request:** `GET /anime?q=…&limit=…&fields=synopsis,media_type,num_episodes,main_picture`. Build the query with `URLSearchParams` (the old code hand-joined with `%20`).
 - **Request options:** header `X-MAL-CLIENT-ID`, `signal: AbortSignal.timeout(10_000)`.
-- **Error mapping** to `MalApiError`:
+- **Error mapping** to `MalApiError`. Error bodies are JSON `{"message": string, "error": string}` (`message` may be `""`). Status codes were **verified live on 2026-11-17** unless marked otherwise.
 
-  | Response | Kind |
-  |---|---|
-  | 400 | `invalid_request` |
-  | 401 | `unauthorized` (bad client ID) |
-  | 403 | `forbidden` (private list) |
-  | 404 | `not_found` |
-  | 429 | `rate_limited` |
-  | fetch throw / timeout | `network` |
-  | anything else | `unknown` |
+  | Response | Kind | Verified example |
+  |---|---|---|
+  | 400 and `message === "Invalid client id"` | `unauthorized` | Bad or garbled `MAL_CLIENT_ID` → `{"message":"Invalid client id","error":"bad_request"}` |
+  | 400 (anything else) | `invalid_request` | `q` < 3 chars → `{"message":"invalid q","error":"bad_request"}`; bad status or limit > 1000 → `bad_request` |
+  | 401 | `unauthorized` | `/users/@me` without OAuth → `{"error":"invalid_token"}` (not used by us) |
+  | 403 | `forbidden` | Missing header → `{"message":"","error":"forbidden"}`. Config validation guarantees the header, so in practice this means a private list. *(Private-list status is unverified: no known private account to test.)* |
+  | 404 | `not_found` | Unknown user → `{"message":"","error":"not_found"}` |
+  | 429 | `rate_limited` | (not verified) |
+  | fetch throw / timeout | `network` | |
+  | anything else | `unknown` | |
 
-- **Test fixtures** (`tests/fixtures/mal/`) follow this response shape. ⚠ Verify it against the live API in Phase 2.
+- **Other verified facts:**
+  - Airing shows return `num_episodes: 0` (e.g. One Piece), which maps to `null`.
+  - Image URLs may be `.jpg` or `.webp`.
+  - `list_status` may also contain `start_date` / `finish_date`.
+  - `paging.next` is a full absolute URL.
+  - Animelist `limit` max is 1000 (1001 → 400).
+  - Fields not listed in `fields=` are omitted (search without `fields` returns only `id`, `title`, `main_picture`).
+- **Test fixtures** (`tests/fixtures/mal/`) copy these **real** response shapes, captured 2026-11-17 and trimmed:
   ```json
-  {"data":[{"node":{"id":52991,"title":"Sousou no Frieren",
-     "main_picture":{"medium":"https://cdn.myanimelist.net/images/anime/1015/138006.jpg","large":"https://cdn.myanimelist.net/images/anime/1015/138006l.jpg"},
-     "synopsis":"…","media_type":"tv","num_episodes":28},
-    "list_status":{"status":"watching","score":0,"num_episodes_watched":12,"is_rewatching":false,"updated_at":"2026-01-01T00:00:00+00:00"}}],
-   "paging":{"next":"https://api.myanimelist.net/v2/users/x/animelist?offset=100&…"}}
+  {"data":[{"node":{"id":16498,"title":"Shingeki no Kyojin",
+     "main_picture":{"medium":"https://cdn.myanimelist.net/images/anime/10/47347.webp","large":"https://cdn.myanimelist.net/images/anime/10/47347l.webp"},
+     "num_episodes":25,"media_type":"tv","synopsis":"Centuries ago, mankind was slaughtered…"},
+    "list_status":{"status":"completed","score":0,"num_episodes_watched":25,"is_rewatching":false,"updated_at":"2023-09-29T23:10:52+00:00"}}],
+   "paging":{"next":"https://api.myanimelist.net/v2/users/someuser/animelist?offset=1&status=completed&sort=list_updated_at&limit=1&fields=list_status%2Cnum_episodes%2Cmedia_type%2Csynopsis%2Cmain_picture"}}
   ```
-  Search returns `{"data":[{"node":{…}}],"paging":{…}}`, with no `list_status`.
+  ```json
+  {"data":[{"node":{"id":21,"title":"One Piece",
+     "main_picture":{"medium":"https://cdn.myanimelist.net/images/anime/1244/138851.jpg","large":"https://cdn.myanimelist.net/images/anime/1244/138851l.jpg"},
+     "synopsis":"Barely surviving in a barrel…","media_type":"tv","num_episodes":0}}],
+   "paging":{"next":"https://api.myanimelist.net/v2/anime?offset=1&q=one+piece&limit=1&fields=synopsis%2Cmedia_type%2Cnum_episodes%2Cmain_picture"}}
+  ```
+  The second example is a search response, which has no `list_status`. The last page has `"paging":{}`, with no `next`.
 
 ### 6.2 Progress bar (port of `Embeds.py` `ExtendedEmbed.progress_bar`)
 - The bar is always 11 emojis, followed by `  {watched} / {total ?? '?'}`.
@@ -277,7 +291,7 @@ The list commands share `listCommand.ts` (a factory taking status and copy).
 | Kind | Message |
 |---|---|
 | `not_found` | MAL user `{u}` not found. |
-| `forbidden` | `{u}`'s list is private. |
+| `forbidden` | Couldn't access `{u}`'s list. It may be private. |
 | `unauthorized` | Bot misconfigured (MAL client ID). This is also logged. |
 | `rate_limited` | MAL is rate-limiting, try again shortly. |
 | `network` / `unknown` | Couldn't reach MyAnimeList. |
@@ -351,7 +365,7 @@ WS-D and WS-E both need the "MalApiError → message" helper. **WS-E owns it** (
 4. **Live smoke test.** Requires the owner to put `APPLICATION_ID` and `MAL_CLIENT_ID` in `.env`. Then:
    1. Run `pnpm emojis:upload`, `pnpm commands:deploy --guild`, `pnpm dev`.
    2. Exercise all 8 commands in DEV_GUILD.
-   3. Re-check the §6.1 fixture shape against real responses (private list status code, `q` < 3 response, `num_episodes: 0` for airing shows). Update the fixtures and mapping if they differ.
+   3. Response shapes and error codes were already verified on 2026-11-17 (§6.1). Only the private-list status remains: if a private account is available, confirm it maps to `forbidden`.
 5. Commit and push. Open a PR only when the owner asks.
 
 ## 8. Out of scope (later)
@@ -362,7 +376,7 @@ WS-D and WS-E both need the "MalApiError → message" helper. **WS-E owns it** (
 ## 9. Risks
 | Risk | Mitigation |
 |---|---|
-| MAL response details unverified until a client ID exists | Fixtures follow the documented shape; Phase 2 step 4 verifies against the live API |
+| Private-list response code unverified | 403 is mapped to a "may be private" message; any other unexpected status falls through to `unknown` with logging |
 | MAL rate limits are undocumented | One request per command (plus paging); 429 → `rate_limited` message |
 | Large completed lists | `limit` defaults to 100 entries; pages render lazily |
 | Agents drifting from contracts | Contracts are frozen in Phase 0; file ownership is disjoint; registry is pre-wired |
