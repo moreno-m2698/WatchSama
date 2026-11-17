@@ -44,8 +44,8 @@ Read from `process.env`. Locally they are loaded via `node --env-file-if-exists=
 | Name | Required | Used for | In GH `prod` today? |
 |---|---|---|---|
 | `BOT_TOKEN` | yes | Login, REST scripts | ✅ |
-| `APPLICATION_ID` | yes | Command deploy, emoji upload | ✅ |
-| `MAL_CLIENT_ID` | yes | MAL API header | ❌ (owner is registering one) |
+| `DISCORD_APPLICATION_ID` | yes | Command deploy, emoji upload | ✅ |
+| `MAL_CLIENT_ID` | yes | MAL API header | ✅ |
 | `MAL_USERNAME` | no | Default user for `/watching` and `/completed` | ❌ |
 | `DEV_GUILD` | no | Guild-scoped command deploy and startup message | ❌ |
 | `PUBLIC_KEY` | no | **Unused** (only needed for HTTP interactions). Kept in prod for future use. | ✅ |
@@ -244,7 +244,7 @@ export interface SlashCommand {
 **Loading emojis at runtime.** `loadProgressEmojis` calls `client.application.emojis.fetch()` and uses `emoji.toString()`. If any of the seven is missing, it logs a warning that names the missing ones (and mentions `pnpm emojis:upload`), then returns `UNICODE_FALLBACK` for the whole set (e.g. `▰` filled, `▱` empty, `♥` heart).
 
 **Upload script** (`scripts/upload-emojis.ts`):
-- Uses `REST` and `Routes.applicationEmojis(APPLICATION_ID)` from discord.js.
+- Uses `REST` and `Routes.applicationEmojis(DISCORD_APPLICATION_ID)` from discord.js.
 - Lists the existing emojis, then for each missing name POSTs `{ name, image: 'data:image/png;base64,…' }`.
 - It is idempotent and prints what it created or skipped.
 
@@ -311,7 +311,7 @@ The list commands share `listCommand.ts` (a factory taking status and copy).
   - On error: log it and reply ephemeral "Something went wrong." Use `followUp` if `deferred` or `replied`, otherwise `reply`.
   - `MalApiError` gets the mapped message instead.
 - **`scripts/deploy-commands.ts`:**
-  - `PUT Routes.applicationCommands(APPLICATION_ID)` (global), or `Routes.applicationGuildCommands(APPLICATION_ID, DEV_GUILD)` with `--guild`.
+  - `PUT Routes.applicationCommands(DISCORD_APPLICATION_ID)` (global), or `Routes.applicationGuildCommands(DISCORD_APPLICATION_ID, DEV_GUILD)` with `--guild`.
   - Imports the command data from `src/bot/registry.ts`.
 - **Process:** `SIGINT`/`SIGTERM` → `client.destroy()`, then exit 0. Log unhandled rejections; don't crash on them.
 
@@ -362,7 +362,7 @@ WS-D and WS-E both need the "MalApiError → message" helper. **WS-E owns it** (
    - MAL client ID registration (myanimelist.net/apiconfig → Create ID → App Type "other").
    - `.env` keys, `pnpm emojis:upload`, `pnpm commands:deploy [--guild]`, `pnpm start`.
    - Command list.
-4. **Live smoke test.** Requires the owner to put `APPLICATION_ID` and `MAL_CLIENT_ID` in `.env`. Then:
+4. **Live smoke test.** Both `DISCORD_APPLICATION_ID` and `MAL_CLIENT_ID` are already in `.env`. Then:
    1. Run `pnpm emojis:upload`, `pnpm commands:deploy --guild`, `pnpm dev`.
    2. Exercise all 8 commands in DEV_GUILD.
    3. Response shapes and error codes were already verified on 2026-11-17 (§6.1). Only the private-list status remains: if a private account is available, confirm it maps to `forbidden`.
