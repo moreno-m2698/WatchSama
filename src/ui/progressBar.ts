@@ -22,9 +22,28 @@ export const UNICODE_FALLBACK: ProgressEmojis = {
 
 /** Render the 11-emoji bar followed by `  {watched} / {total ?? '?'}`. */
 export function renderProgressBar(
-  _watched: number,
-  _total: number | null,
-  _e: ProgressEmojis,
+  watched: number,
+  total: number | null,
+  e: ProgressEmojis,
 ): string {
-  throw new Error('not implemented');
+  if (total === null || total <= 0) {
+    return `${e.heartStart}${e.emptyMid.repeat(9)}${e.emptyEnd}  ${watched} / ?`;
+  }
+  const clamped = Math.min(Math.max(watched, 0), total);
+  const k = Math.floor((clamped * 10) / total);
+
+  let bar: string;
+  if (clamped >= total) {
+    bar = e.filledStart + e.filledMid.repeat(9) + e.heartEnd;
+  } else if (k === 0) {
+    bar = e.heartStart + e.emptyMid.repeat(9) + e.emptyEnd;
+  } else {
+    bar =
+      e.filledStart +
+      e.filledMid.repeat(k - 1) +
+      e.heartMid +
+      e.emptyMid.repeat(9 - k) +
+      e.emptyEnd;
+  }
+  return `${bar}  ${watched} / ${total}`;
 }
