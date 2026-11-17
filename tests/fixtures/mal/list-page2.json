@@ -1,0 +1,15 @@
+{
+  "data": [
+    {
+      "node": { "id": 9999, "title": "No Picture Show", "media_type": "ova" },
+      "list_status": {
+        "status": "completed",
+        "score": 0,
+        "num_episodes_watched": 2,
+        "is_rewatching": false,
+        "updated_at": "2023-09-27T10:00:00+00:00"
+      }
+    }
+  ],
+  "paging": {}
+}

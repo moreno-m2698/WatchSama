@@ -1,0 +1,48 @@
+{
+  "data": [
+    {
+      "node": {
+        "id": 16498,
+        "title": "Shingeki no Kyojin",
+        "main_picture": {
+          "medium": "https://cdn.myanimelist.net/images/anime/10/47347.webp",
+          "large": "https://cdn.myanimelist.net/images/anime/10/47347l.webp"
+        },
+        "num_episodes": 25,
+        "media_type": "tv",
+        "synopsis": "Centuries ago, mankind was slaughtered..."
+      },
+      "list_status": {
+        "status": "completed",
+        "score": 0,
+        "num_episodes_watched": 25,
+        "is_rewatching": false,
+        "updated_at": "2023-09-29T23:10:52+00:00"
+      }
+    },
+    {
+      "node": {
+        "id": 21,
+        "title": "One Piece",
+        "main_picture": {
+          "medium": "https://cdn.myanimelist.net/images/anime/1244/138851.jpg",
+          "large": "https://cdn.myanimelist.net/images/anime/1244/138851l.jpg"
+        },
+        "synopsis": "Barely surviving in a barrel...",
+        "media_type": "tv",
+        "num_episodes": 0
+      },
+      "list_status": {
+        "status": "completed",
+        "score": 9,
+        "num_episodes_watched": 1000,
+        "is_rewatching": false,
+        "start_date": "2020-01-01",
+        "updated_at": "2023-09-28T10:00:00+00:00"
+      }
+    }
+  ],
+  "paging": {
+    "next": "https://api.myanimelist.net/v2/users/someuser/animelist?offset=2&status=completed&sort=list_updated_at&limit=2&fields=list_status%2Cnum_episodes%2Cmedia_type%2Csynopsis%2Cmain_picture"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "data": [
+    {
+      "node": {
+        "id": 21,
+        "title": "One Piece",
+        "main_picture": {
+          "medium": "https://cdn.myanimelist.net/images/anime/1244/138851.jpg",
+          "large": "https://cdn.myanimelist.net/images/anime/1244/138851l.jpg"
+        },
+        "synopsis": "Barely surviving in a barrel...",
+        "media_type": "tv",
+        "num_episodes": 0
+      }
+    },
+    {
+      "node": {
+        "id": 459,
+        "title": "One Piece Film: Strong World",
+        "main_picture": { "medium": "https://cdn.myanimelist.net/images/anime/1/1.webp" },
+        "synopsis": "A film.",
+        "media_type": "movie",
+        "num_episodes": 1
+      }
+    }
+  ],
+  "paging": {
+    "next": "https://api.myanimelist.net/v2/anime?offset=2&q=one+piece&limit=2&fields=synopsis%2Cmedia_type%2Cnum_episodes%2Cmain_picture"
+  }
+}
