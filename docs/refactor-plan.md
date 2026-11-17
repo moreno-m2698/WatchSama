@@ -1,6 +1,6 @@
 # WatchSama Refactor Plan: Python/discord.py/Selenium → TypeScript/discord.js/MAL API v2
 
-Branch: `refactor`. Status: **awaiting owner review**.
+Branch: `refactor`. Status: **Phases 0–1 complete; Phase 2 (integration) done except the live smoke test.**
 
 ## 1. Decisions (locked)
 

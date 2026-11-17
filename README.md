@@ -2,62 +2,117 @@
     This project is currently in development!<br>
 </h2>
 
-## About: 
+## About
 
-WatchSama is an open-source Discord bot that aims to be the go to bot in connecting your Discord account with your MyAnimeList account. By using WatchSama you will be able to share and express your anime interests from your MAL account with your discord server through its custom generated views and embeds in a visually appealing way. WatchSama also has search capabilties as well so you will be able to search for anime recommendations by using its built in search command!
+WatchSama is an open-source Discord bot that connects your Discord server with MyAnimeList (MAL). It shows the anime you're watching or have completed on your MAL account as paginated embeds, including a custom progress bar, and it can search MAL for anime.
+
+The bot is written in TypeScript with [discord.js](https://discord.js.org). It reads all MAL data from the official [MyAnimeList API v2](https://myanimelist.net/apiconfig/references/api/v2), so no browser or scraping is involved.
 
 This bot is available for anyone to clone and edit to match their server needs.
 
-## Planned Features:
+## Planned Features
 
-- Moderation Tools
-- Database Integration
-- MyAnimeList Account Editor
+- Per-user MAL account linking
+- MyAnimeList list editing (MAL OAuth2)
+- Moderation tools
 
-## Setup:
+## Commands
 
----
+| Command | Description |
+|---|---|
+| `/watching [username]` | Shows currently-watching anime with a progress bar. Defaults to `MAL_USERNAME`. |
+| `/completed [username]` | Shows completed anime. Defaults to `MAL_USERNAME`. |
+| `/search <query>` | Searches MAL (3+ characters). Only you can see the results. |
+| `/ping` | Bot latency |
+| `/info` | About WatchSama |
+| `/serverinfo` | Member and channel counts for the current server |
+| `/userinfo [user]` | Info about a server member |
+| `/stop` | Shuts the bot down (application owner only) |
 
-### Creating Discord Developer Project
+Results are paginated with ◀ ▶ buttons. Only the person who ran the command can page, and the buttons disable after 3 minutes.
 
-Before you begin using this bot you will need to create a Discord developer account which can be done [here](https://discord.com/developers). Once you have logged in you will want to create a new application by hitting the `New Application` button and naming your application. 
+## Setup
 
-> Note that you can edit the public name of the bot and its profile picture under the bot tag of the selected project's settings.
+### Requirements
 
-### Installation
+- [Node.js 24+](https://nodejs.org)
+- [pnpm](https://pnpm.io) (`npm install -g pnpm`)
 
-Next you will want to install the bot by cloning the repository into a file using:
+### 1. Create a Discord application
 
+1. Create an application in the [Discord Developer Portal](https://discord.com/developers/applications).
+2. Under **General Information**, copy the **Application ID**.
+3. Under **Bot**, reset and copy the **Token**. (Never share this token.)
+   - WatchSama needs **no privileged gateway intents**, so you can leave all of them off.
+4. Under **OAuth2 → URL Generator**, select the scopes `bot` and `applications.commands`.
+5. Grant the bot permissions **View Channels**, **Send Messages** and **Embed Links**.
+6. Open the generated URL to invite the bot to your server.
+
+### 2. Get a MyAnimeList client ID
+
+1. While logged in to MAL, go to [myanimelist.net/apiconfig](https://myanimelist.net/apiconfig) and click **Create ID**.
+2. Use App Type **other** and Redirect URL `http://localhost`, and fill in the remaining fields.
+3. Copy the **Client ID**. No client secret is needed.
+
+### 3. Install and configure
+
+```sh
+git clone https://github.com/moreno-m2698/WatchSama.git
+cd WatchSama
+pnpm install
+cp .env.example .env
 ```
-$ git clone https://github.com/moreno-m2698/WatchSama.git
-$ cd WatchSama
-$ pip install -r requirements.txt
+
+Fill in `.env`:
+
+| Key | Required | Description |
+|---|---|---|
+| `BOT_TOKEN` | yes | Discord bot token |
+| `DISCORD_APPLICATION_ID` | yes | Discord application ID |
+| `MAL_CLIENT_ID` | yes | MyAnimeList API client ID |
+| `MAL_USERNAME` | no | Default MAL user for `/watching` and `/completed` |
+| `DEV_GUILD` | no | Server ID for instant command deploys and a startup message |
+
+Real environment variables take precedence over `.env`.
+
+### 4. One-time setup: emojis and commands
+
+```sh
+pnpm emojis:upload             # uploads the progress-bar emojis to your application
+pnpm commands:deploy --guild   # registers slash commands in DEV_GUILD (instant)
+pnpm commands:deploy           # or register globally (can take a while to appear)
 ```
 
-### Setup 
+`emojis:upload` is idempotent and only uploads emojis that are missing. If you skip it, the progress bar falls back to Unicode characters (▰▱♥).
 
-Once you have opened up the project you will want to create a `.env` file using the format of the `.env.example` file which is provided. For this bot to function you will need the following:
+Re-run `commands:deploy` whenever command names or options change.
 
-- MyAnimeList account username
-- Discord application key
-- (Optional) Discord Guild ID for bot testing
+### 5. Run
 
-### Discord Application Key
+```sh
+pnpm dev      # development, restarts on file changes
+pnpm build && pnpm start   # compiled
+```
 
-To receive your application key, select the Application you are wanting to generate and select General under the OAuth2 tab of settings. You will want to select the `Reset Secret` button and copy this key into your `.env` file. (DO NOT SHOW THIS KEY AS IT CAN RISK YOUR APPLICATION'S SECURITY)
+Stop the bot with `Ctrl+C` or `/stop`.
 
-### Generate Bot Invitation Link
+## Development
 
-To generate the invitation link for your bot you will want to select URL Generator under the OAuth2 tab of your application settings. From there you will want to select the bot checkbot under Scopes which will then cause the Bot Permissions table to open up. Under general permissions select the Administrator checkbox and copy the generated url at the bottom of the page. Upon navigating to this url you will be able to invite the bot to your desired server.
+```sh
+pnpm typecheck   # tsc
+pnpm lint        # eslint
+pnpm test        # vitest
+pnpm format      # prettier
+```
 
-### Additional Edits
+Source layout:
 
-WatchSama uses custom emotes to generate the watch progress bar. In order to use the feature you must add these emotes to your server and replace the values inside of [this file](https://github.com/moreno-m2698/WatchSama/blob/main/watchsama/cogs/mal/API/Embeds.py) under `ExtendedEmbed`, `self._emoji_bar_dict`.
+| Path | Contents |
+|---|---|
+| `src/mal/` | MAL API client |
+| `src/ui/` | Embeds, progress bar, paginator, emojis |
+| `src/commands/` | Slash commands |
+| `src/bot/` | Client, router and events |
+| `scripts/` | Command deploy and emoji upload |
 
-### Commands
-
-- !watching - this command will generate a list of embeds and progress bars for shows that are currently being watched on the linked account.
-
-- !complete - This command will generate a list of embeds to show off what shows you have completed.
-
-- !search `args` - This command will provide you search result information from MyAnimeList.
+The migration plan from the original Python version is in [`docs/refactor-plan.md`](docs/refactor-plan.md).
